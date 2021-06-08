@@ -1,0 +1,19 @@
+AHHH Start
+HhhHHhhHHhhHHhhH Set cell 0 to 4
+HHHh Square cell 0 -> 16
+HHhH double cell 0 -> 32
+HhhH Add 1 to cell 0 -> 33 (ASCII !)
+hhhH Move pointer to cell 1
+HhhHHhhHHhhHHhhH Set cell 1 to 4 - loop counter
+
+HHHH Start loop
+HhHh Decrement cell 1
+hhHh Move to cell 0
+Hhhh Print cell 0
+hhhH Move to cell 1
+hhhh End loop
+
+hhhHhhhH move pointer right by 2. Next is Hello, World:
+HhhHHHhHHHHhHHHhHHhHHHhHHhhHHhhHHhhHHhhHHhhHHhhHHhhHHhhHhHhhHhhhhhhHHhhHHHhHHHHhHHHhHHhHhHHhhHhhhHhhHhHhHhHhHhHhHhhhhhhHhHhhHhhHHhhHHhhHHhhHhHhhHhhhhhhHhHhhhHhhHhhhhhhHhHhhhHhhHhhHHhhHHhhHHhhhhhhHHhhHHHhHHHHhHHHhHHhHhHhHHHhhHhhHHHhHHHHhHHHhhHHHhHhHHhHhHhHhHhHhHhHhHhhhhhhHHhhHHHhHHHHhHHHhHHhHHhhhhhhHHhhHHHhHHHHhHHHhHHhHHHhHhHhHHHhhHhhHHHhHHHHhHHHhhHHHHHhhHhhHHHhHHHhHHHhHhHHHhHhHHhHhHhhhhhhHhHhhHhhHHhhHHhhHhHhhHhhhhhhHhHhhhHhhHhhHHhhHHhhHHhhhhhhHhHhhHhHhHhHhHhHhhHhhHhhhhhhHhHhhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhHhhhhhhHHhhHHHhHHHHhHHHhHHhHHhhHHhhhhhh!
+
+
