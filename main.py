@@ -20,10 +20,10 @@ __author__ = "Charles D Wimmer"
 __copyright__ = "Copyright 2021, Charles D Wimmer"
 __credits__ = "Charles D Wimmer"
 __licence__ = "GPL"
-__version__ = "07062021"
+__version__ = "20210608"
 __twitter__ = "@CharlesDWimmer"
 __email__ = __twitter__  # yup
-__status__ = "Stage 1: Denial"
+__status__ = "Stage 2: Bargaining"
 
 
 REGISTER_1 = None  # "None" indicates that we have no value yet set to a register.
@@ -91,7 +91,6 @@ def run():
     global MEMORY_TAPE
     global REGISTER_1, REGISTER_2
 
-
     if len(PROGRAM) == 0 or PROGRAM[0] != 16:
         throw_error("Program is empty or does not start with 'AHHH'")
     while True:
@@ -106,7 +105,22 @@ def run():
         if instruction == 0:
             """Searching in reverse, skip the first preceding command, and then jump back to matching HHHH command and 
             begin execution from that HHHH command (end loop)."""
-            raise NotImplemented
+            level = 1
+            PROGRAM_REGISTER -= 1
+            while level > 0:
+                if PROGRAM_REGISTER == 1:
+                    throw_error("Cannot end loop as first instruction!")
+                PROGRAM_REGISTER -= 1
+
+                if PROGRAM[PROGRAM_REGISTER] == 0:
+                    level += 1
+
+                elif PROGRAM[PROGRAM_REGISTER] == 15:
+                    level -= 1
+            if level != 0:
+                throw_error("Loop error")
+            continue  # avoid incrementing the program register at the end of the main run() while.
+
         # hhhH
         elif instruction == 1:
             """Move the pointer right one cell."""
@@ -209,7 +223,27 @@ def run():
             MEMORY_TAPE[POINTER_POS] = MEMORY_TAPE[POINTER_POS]**2
         # HHHH
         elif instruction == 15:
-            raise NotImplemented
+            if MEMORY_TAPE[POINTER_POS] == 0:  # if non-zero then we skip the loop, otherwise do nothing.
+                level = 1
+                prev = 0
+                PROGRAM_REGISTER += 1
+                if PROGRAM_REGISTER >= len(PROGRAM) - 1:
+                    throw_error("Loop error, EOF while searching for end of loop")
+                while level > 0:
+                    prev = PROGRAM[PROGRAM_REGISTER]
+                    PROGRAM_REGISTER += 1
+                    if PROGRAM_REGISTER == len(PROGRAM) - 1:
+                        break
+                    elif PROGRAM[PROGRAM_REGISTER] == 15:
+                        level += 1
+                    elif PROGRAM[PROGRAM_REGISTER] == 0:
+                        # found a hhhh
+                        level -= 1
+                        if prev == 15:
+                            level -= 1
+                if level != 0:
+                    throw_error("Loop error, EOF while searching for end of loop")
+        # AHHH
         elif instruction == 16:
             """Start program."""
             pass  # not sure what to do if this is encountered in the wrong place?
