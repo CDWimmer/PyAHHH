@@ -3,6 +3,7 @@
 A Python implementation of an AHHH language interpreter originally concocted by Kyle Morgenstein, for some reason.
 I wrote this because I don't know C++ or know how to compile C++ but I still need to scream.
 Requires Python 3.6 or above.
+I honestly have no idea if this meets the original spec, I spent maybe 5 hours on this.
 
 Find the original AHHH here: https://github.com/KyleM73/AHHH
 
@@ -89,9 +90,7 @@ def run():
     global PROGRAM_REGISTER
     global MEMORY_TAPE
     global REGISTER_1, REGISTER_2
-    # temp
-    REGISTER_1_HAS_VALUE = False
-    REGISTER_2_HAS_VALUE = False
+
 
     if len(PROGRAM) == 0 or PROGRAM[0] != 16:
         throw_error("Program is empty or does not start with 'AHHH'")
@@ -130,32 +129,22 @@ def run():
         elif instruction == 4:
             """If Register 1 is empty, copy the current memory cell to the register. Otherwise, write the Register 1 
             value to the current memory cell."""
-            # if REGISTER_1 is None:
-            #     REGISTER_1 = MEMORY_TAPE[POINTER_POS]
-            # else:  # register has value
-            #     MEMORY_TAPE[POINTER_POS] = REGISTER_1
-            #     REGISTER_1 = 0
-            if REGISTER_1_HAS_VALUE:
-                MEMORY_TAPE[POINTER_POS] = REGISTER_1
-                #REGISTER_1 = 0
-            else:
+            if REGISTER_1 is None:
                 REGISTER_1 = MEMORY_TAPE[POINTER_POS]
-                REGISTER_1_HAS_VALUE = not REGISTER_1_HAS_VALUE
+            else:  # register has value
+                MEMORY_TAPE[POINTER_POS] = REGISTER_1
+                REGISTER_1 = None
+
         # hHhH
         elif instruction == 5:
             """If Register 2 is empty, copy the current memory cell to the register. Otherwise, write the Register 2 
             value to the current memory cell."""
-            # if REGISTER_2 is None:
-            #     REGISTER_2 = MEMORY_TAPE[POINTER_POS]
-            # else:
-            #     MEMORY_TAPE[POINTER_POS] = REGISTER_2
-            #     REGISTER_2 = 0
-            if REGISTER_2_HAS_VALUE:
-                MEMORY_TAPE[POINTER_POS] = REGISTER_2
-                #REGISTER_2 = 0
-            else:
+            if REGISTER_2 is None:
                 REGISTER_2 = MEMORY_TAPE[POINTER_POS]
-                REGISTER_2_HAS_VALUE = not REGISTER_2_HAS_VALUE
+            else:
+                MEMORY_TAPE[POINTER_POS] = REGISTER_2
+                REGISTER_2 = None
+
         # hHHh
         elif instruction == 6:
             """Add the current memory cell to the value of Register 1 and store the sum in Register 1. The memory cell 
@@ -247,7 +236,6 @@ if __name__ == '__main__':
         debug = True
 
     # read program
-    print(args)
     read_program(args.filepath)
     if debug:
         print(f"PROGRAM CODE:\n{', '.join(str(x) for x in PROGRAM)}")
