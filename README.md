@@ -17,7 +17,7 @@ To execute a .ahhh file provide it as the first argument to `main.py` as such:
 ```
 python main.py demo/test.ahhh
 ```
-on linux you'll probably have to specify your python version like `python3.8 ...`
+on linux you'll probably have to specify your python version like `python3.8 ...` or better yet make a venv. 
 
 #### Debug Mode
 
@@ -28,7 +28,7 @@ To enable debug mode simply apply the `-d` flag at the command line:
 python main.py demo/test.ahhh -d
 ```
 ----
-### Simple Example Execution
+### Example Code Logic Walkthrough
 
 Lets look at [test.ahhh](/demo/test.ahhh):
 ```
