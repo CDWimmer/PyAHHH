@@ -1,0 +1,16 @@
+AHHH This program should be ran in --input mode. It will read out the whole input file to the console.
+
+Hhhh read character to cell 0
+
+HHHH start loop if current cell is not 0
+
+Hhhh cell is non-zero so print it as ASCII
+HHhh set current cell to zero
+
+Hhhh read character to cell 0
+
+hhhh end loop
+
+hhh! newline to be nice ;)
+
+WHY? Because I wanted AHHH to be more useful for code-golf-esque challenges
