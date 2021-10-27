@@ -3,9 +3,13 @@
 A Python implementation of an AHHH language interpreter originally concocted by Kyle Morgenstein, for some reason.
 I wrote this because I don't know C++ or know how to compile C++ but I still need to scream.
 Requires Python 3.6 or above.
-I honestly have no idea if this meets the original spec, I spent maybe 5 hours on this.
+I honestly have no idea if this even meets the original spec, I spent maybe 6 hours on this. I've also extended the
+interpreter to include an "input" mode, where instead of entering inputs manually into the console it will read from
+a provided input file. :)
 
 Find the original AHHH here: https://github.com/KyleM73/AHHH
+
+If you've come across this file outside of Github then find my repo here: https://github.com/CDWimmer/PyAHHH
 
 Like the original, feel free to edit/use as you like, but please do not sell this nonsense or its derivatives.
 (This is predominantly life advice rather than a legal disclaimer but I suppose both can be true)
@@ -19,11 +23,11 @@ from sys import stderr, exit
 __author__ = "Charles D Wimmer"
 __copyright__ = "Copyright 2021, Charles D Wimmer"
 __credits__ = "Charles D Wimmer"
-__licence__ = "GPL"
-__version__ = "20210608"
+__licence__ = "GPL-3.0 Licence"
+__version__ = "27102021"
 __twitter__ = "@CharlesDWimmer"
 __email__ = __twitter__  # yup
-__status__ = "Stage 2: Bargaining"
+__status__ = "Stage 3: Bargaining"
 
 
 REGISTER_1 = None  # "None" indicates that we have no value yet set to a register.
@@ -32,9 +36,11 @@ PROGRAM_REGISTER = 0  # keeping track of which program instruction we're on.
 POINTER_POS = 0
 MEMORY_TAPE = [0]  # I don't know if this should start as totally empty or with an [0] = 0 but this made less errors
 PROGRAM = []
+MODE = 0  # 0 - interactive, request from stdin for input. 1 - read from file for input (no idea if it works right)
+INPUT = ""
 CODES = {
     "hhhh": 0, "hhhH": 1, "hhHh": 2, "hhHH": 3, "hHhh": 4, "hHhH": 5, "hHHh": 6, "hHHH": 7, "Hhhh": 8, "HhhH": 9,
-    "HhHh": 10, "HhHH": 11, "HHhh": 12, "HHhH": 13, "HHHh": 14, "HHHH": 15, "AHHH": 16, "hhh!": 17
+    "HhHh": 10, "HhHH": 11, "HHhh": 12, "HHhH": 13, "HHHh": 14, "HHHH": 15, "AHHH": 16, "hhh!": 17, "WHY?": 18
 }
 
 
@@ -43,9 +49,10 @@ def quit_ahhh(exit_code):
         print("== EXECUTION FINISHED. ==\n"
               f"Exit code: {exit_code}\n"
               f"MEMORY TAPE: {MEMORY_TAPE}\n"
+              f"MEMORY POINTER: {POINTER_POS}\n"
               f"REGISTER 1: {REGISTER_1}\n"
               f"REGISTER 2: {REGISTER_2}\n"
-              f"PROGRAM REGISTER: {PROGRAM_REGISTER}")
+              f"PROGRAM REGISTER: {PROGRAM_REGISTER}\n")
     exit(exit_code)
 
 
@@ -53,6 +60,17 @@ def throw_error(message):
     """This is probably a horrible way to do this"""
     print(f"Error: {message}", file=stderr)
     quit_ahhh(1)
+
+
+def read_input(message):
+    if MODE == 0:
+        return input(message) or 0  # return whatever was entered or zero on blank
+    elif MODE == 1:
+        try:
+            return INPUT.pop(0)
+        except IndexError:
+            # input is empty/EOF, return zero
+            return 0
 
 
 def read_program(filepath):
@@ -69,16 +87,17 @@ def read_program(filepath):
             for i, line in enumerate(lines):
                 line = line.strip()  # no newlines >:(  - stripping empty lines or lines without comments
                 if len(line) % 4 != 0:
-                    throw_error(f"Instructions of wrong length (len % 4 != 0) on line {i+1}")
+                    throw_error(f"Instructions of wrong length (len % 4 != 0) on line {i + 1}")
                 elif len(line) == 0:
-                    continue  # blank lines are allowed we just ignore them :)
+                    continue  # blank lines are allowed we just ignore them :) Reading in the lines above cuts off the
+                    # CRLFs so this is works.
                 else:
                     # https://stackoverflow.com/questions/9475241/split-string-every-nth-character
                     n = 4  # instructions are length 4.
-                    instructions = [line[i:i+n] for i in range(0, len(line), n)]
+                    instructions = [line[i:i + n] for i in range(0, len(line), n)]
                     for instruction in instructions:
                         if instruction not in CODES.keys():
-                            throw_error(f"Instruction `{instruction}` not recognised on line {i+1}.")
+                            throw_error(f"Instruction `{instruction}` not recognised on line {i + 1}.")
                         else:
                             # actually start turning it into codes!
                             PROGRAM.append(CODES[instruction])
@@ -86,7 +105,7 @@ def read_program(filepath):
 
 def run():
     """All AHHH program execution happens in here"""
-    global POINTER_POS  # I don't understand why it wants this but the snake lang must feed on tears
+    global POINTER_POS  # I don't understand why it wants this but the language of snakes must feed on tears
     global PROGRAM_REGISTER
     global MEMORY_TAPE
     global REGISTER_1, REGISTER_2
@@ -184,9 +203,17 @@ def run():
                 inputting = True
                 while inputting:
                     try:
-                        MEMORY_TAPE[POINTER_POS] = ord(input("ASCII character input: "))
+                        if (user_input := read_input("ASCII character input: ")) == 0:
+                            # if its been set to zero on blank input
+                            # walruses are so cool :=
+                            MEMORY_TAPE[POINTER_POS] = 0
+                        else:
+                            MEMORY_TAPE[POINTER_POS] = ord(user_input)
                     except TypeError:
-                        print("Please enter a valid ASCII character. ")
+                        print("Please enter a single valid ASCII character. ")
+                    else:
+                        inputting = False
+
         # HhhH
         elif instruction == 9:
             """Increment the current memory cell by one."""
@@ -206,9 +233,11 @@ def run():
                 inputting = True
                 while inputting:
                     try:
-                        MEMORY_TAPE[POINTER_POS] = ord(input("Integer input: "))
+                        MEMORY_TAPE[POINTER_POS] = int(read_input("Integer input: "))
                     except TypeError:
                         print("Please enter a valid integer. ")
+                    else:
+                        inputting = False
         # HHhh
         elif instruction == 12:
             """Set the current memory cell to zero."""
@@ -220,7 +249,7 @@ def run():
         # HHHh
         elif instruction == 14:
             """Square the value of the current memory cell and store it in the current memory cell."""
-            MEMORY_TAPE[POINTER_POS] = MEMORY_TAPE[POINTER_POS]**2
+            MEMORY_TAPE[POINTER_POS] = MEMORY_TAPE[POINTER_POS] ** 2
         # HHHH
         elif instruction == 15:
             if MEMORY_TAPE[POINTER_POS] == 0:  # if non-zero then we skip the loop, otherwise do nothing.
@@ -228,7 +257,7 @@ def run():
                 prev = 0
                 PROGRAM_REGISTER += 1
                 if PROGRAM_REGISTER >= len(PROGRAM) - 1:
-                    throw_error("Loop error, EOF while searching for end of loop")
+                    throw_error("Loop error, EOF while searching for end of loop.")
                 while level > 0:
                     prev = PROGRAM[PROGRAM_REGISTER]
                     PROGRAM_REGISTER += 1
@@ -242,15 +271,19 @@ def run():
                         if prev == 15:
                             level -= 1
                 if level != 0:
-                    throw_error("Loop error, EOF while searching for end of loop")
+                    throw_error("Loop error, EOF while searching for end of loop.")
         # AHHH
         elif instruction == 16:
             """Start program."""
-            pass  # not sure what to do if this is encountered in the wrong place?
+            pass  # not sure what to do if this is encountered in the wrong place? Ignoring for now
         # hhh!
         elif instruction == 17:
             """Print new line (useful after printing ASCII characters, which otherwise don't print a new line)."""
-            print("")  # prints newline automatically.
+            print("")  # prints newline automatically, probably.
+
+        elif instruction == 18:
+            """Do nothing. WHY? is for comment lines/REMarks."""
+            pass
 
         if debug:
             print(f"-> MEM: {MEMORY_TAPE}\tREG1: {REGISTER_1}\tREG2: {REGISTER_2}\t MPOS: {POINTER_POS}")
@@ -262,12 +295,30 @@ def run():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='An AHHH interpreter written in Python.', epilog='Ahhhhhhh!')
     parser.add_argument('filepath', type=str, help='filepath for a .ahhh script.')
-    parser.add_argument('-d', '--debug', help='Debug mode flag', action='store_true')
+    parser.add_argument('-i', '--input', help='Input file. Optional. If not present then inputs will be requested from '
+                                              'console.', required=False)
+    parser.add_argument('-d', '--debug', help='Debug mode flag.', action='store_true')
     args = parser.parse_args()
     debug = False
     if args.debug:
         print("== DEBUG MODE IS ON. ==")
         debug = True
+
+    if args.input:
+        if debug:
+            print("== This input mode is experimental, if it's horribly broken please leave an issue on the GitHub! ==")
+            print("== LOADING INPUT FILE TO MEMORY ==")
+        MODE = 1  # file input mode
+        try:
+            with open(args.input, 'r') as in_file:
+                INPUT = list(''.join(in_file.readlines()))
+                if INPUT == "":
+                    throw_error(f"Provided input file ({args.input}) is empty!")
+                if debug:
+                    print(f"== INPUT FILE PROVIDED: {args.input} ==")
+                    print(f"INPUT CONTENT: {''.join(INPUT)}")
+        except FileNotFoundError as e:
+            print(f"File {args.input} does not seem to exist!")
 
     # read program
     read_program(args.filepath)
