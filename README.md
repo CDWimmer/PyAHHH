@@ -1,10 +1,16 @@
+[![license](https://img.shields.io/github/license/CDWimmer/PyAHHH?style=flat-square)](/LICENCE)
+[![pyversion](https://img.shields.io/badge/Python-3.6%2B-blue?style=flat-square)]()
+[![stars](https://img.shields.io/github/stars/CDWimmer/PyAHHH?style=flat-square)]()
+[![size](https://img.shields.io/github/languages/code-size/CDWimmer/PyAHHH?style=flat-square)]()
+[![coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-ko--fi.com%2Fch4rl1e-orange?link=https://ko-fi.com/ch4rl1e&style=social)](https://ko-fi.com/ch4rl1e)
+
 # PyAHHH
+
 ### An [AHHH](https://github.com/KyleM73/AHHH) interpreter written in Python. Creating it made me scream. 
+
 ---
 
 Finely crafted by Kyle Morgenstein, AHHH is an esoteric language written entirely by screaming into the void. The original interpreter code provided by Morgenstein is written in C++. I don't know C++ nor how to compile it on Windows, so I just wrote it in Python instead. 
-
-To execute this script Python 3.6 or above is required. (I like f-strings)
 
 Demo programs are available in the [demo](/demo) folder. 
 
@@ -19,9 +25,20 @@ python main.py demo/test.ahhh
 ```
 on linux you'll probably have to specify your python version like `python3.8 ...` or better yet make a venv. 
 
+#### Input Mode
+
+Though not included in Morgenstein's original vision, this interpreter has been extended to include an "input mode", where one can specify an ASCII input file that will be stepped through for character inputs instead of requesting from the user. It also makes it better for code-golf style challenges. Isn't that nice?
+
+If a script reaches EOF on the input file it will just take it the same as a blank user input: a numeric `0`. (So for example input-based loops can be broken) 
+
+To use just specify the -i flag and provide a filepath:
+```
+python main.py demo/type.ahhh -i demo/sometext.txt
+```
+
 #### Debug Mode
 
-An addition made over the original is a "debug mode". This prints out a lot of extra information such as each instruction code being executed, and the state of memory and the registers after each instruction. etc. 
+Another addition made over the original is a "debug mode". This prints out a lot of extra information such as each instruction code being executed, and the state of memory and the registers after each instruction. etc. 
 
 To enable debug mode simply apply the `-d` flag at the command line:
 ```
@@ -52,7 +69,7 @@ Lastly for cell 0 we add 1 again. This leaves us with an integer 33, which is an
 hhhH Move pointer to cell 1
 HhhHHhhHHhhHHhhH Set cell 1 to 4 - loop counter
 ```
-Now we shift the memory pointer over to the right. Newly encountered memory cells are initialised to zero, so cell 1 is zero. Nex, like before, we increment cell 1 to hold a value of 4. This cell will be our loop counter.
+Now we shift the memory pointer over to the right. Newly encountered memory cells are initialised to zero, so cell 1 is zero. Next, like before, we increment cell 1 to hold a value of 4. This cell will be our loop counter.
 
 ```
 HHHH Start loop
