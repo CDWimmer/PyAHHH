@@ -10,7 +10,7 @@
 
 ---
 
-Finely crafted by Kyle Morgenstein, AHHH is an esoteric language written entirely by screaming into the void. The original interpreter code provided by Morgenstein is written in C++. I don't know C++ nor how to compile it on Windows, so I just wrote it in Python instead. 
+Finely crafted by Kyle Morgenstein, AHHH is an esoteric language written entirely by screaming into the void. The original interpreter code provided by Morgenstein is written in C++. I don't know C++ nor how to compile it, so I wrote it in Python instead. 
 
 Demo programs are available in the [demo](/demo) folder. 
 
@@ -25,13 +25,15 @@ python main.py demo/test.ahhh
 ```
 on linux you'll probably have to specify your python version like `python3.8 ...` or better yet make a venv. 
 
+### Modifications
+
 #### Input Mode
 
 Though not included in Morgenstein's original vision, this interpreter has been extended to include an "input mode", where one can specify an ASCII input file that will be stepped through for character inputs instead of requesting from the user. It also makes it better for code-golf style challenges. Isn't that nice?
 
 If a script reaches EOF on the input file it will just take it the same as a blank user input: a numeric `0`. (So for example input-based loops can be broken) 
 
-To use just specify the -i flag and provide a filepath:
+To use just specify the `-i` flag and provide a filepath:
 ```
 python main.py demo/type.ahhh -i demo/sometext.txt
 ```
@@ -44,8 +46,13 @@ To enable debug mode simply apply the `-d` flag at the command line:
 ```
 python main.py demo/test.ahhh -d
 ```
+
+#### WHY? - A REMark Instruction
+
+Comments can be added to any AHHH script by just including a space after a command and then writing whatever you want, but for large comments this isn't great. As such I've added a new instruction, `WHY?`, to the pyAHHH edition of the language that does nothing bar indicating to the reader that the line contains a comment thereafter. More or less the same as a batch `REM` command. Do note this is *incompatible* with the original AHHH and I don't know how it will behave, unless its been updated since this README. 
+
 ----
-### Example Code Logic Walkthrough
+### Example Code Walkthrough
 
 Lets look at [test.ahhh](/demo/test.ahhh):
 ```
